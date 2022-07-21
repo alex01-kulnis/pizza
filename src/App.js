@@ -1,9 +1,12 @@
 import React from 'react';
+
 import './scss/app.scss';
 import Header from './components/Header';
 import Categories from './components/Categories';
 import Sort from './components/Sort';
 import PizzaBlock from './components/PizzaBlock';
+
+import pizzas from './assets/img/pizzas.json';
 
 function App() {
   return (
@@ -17,11 +20,9 @@ function App() {
           </div>
           <h2 class="content__title">Все пиццы</h2>
           <div class="content__items">
-            <PizzaBlock />
-            <PizzaBlock />
-            <PizzaBlock />
-            <PizzaBlock />
-            <PizzaBlock />
+            {pizzas.map((item) => (
+              <PizzaBlock {...item} />
+            ))}
           </div>
         </div>
       </div>
