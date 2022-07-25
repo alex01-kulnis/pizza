@@ -21,9 +21,6 @@ const Home = ({ searchValue }) => {
       const category = categoryId > 0 ? `category=${categoryId}` : '';
       const search = searchValue ? `&search=${searchValue}` : '';
 
-      // const itemsResp = await axios.get(
-      //   `https://62d52f16d4406e523554ca5d.mockapi.io/items?${categoryId > 0 ? `category=${categoryId}` : ''}`,
-      // );
       const itemsResp = await axios.get(
         `https://62d52f16d4406e523554ca5d.mockapi.io/items?page=${currentPage}&limit=4&${category}&sortBy=${sortType.sortProperty}&order=desc${search}`,
       );
