@@ -8,7 +8,7 @@ body {
 }
 
 .wrapper {
-  width: calc(100vw - 100px);
+  // width: calc(100vw - 100px);
   height: 100%;
   background-color: #fff;
   margin: 50px auto;
@@ -135,8 +135,8 @@ body {
   }
 
   .content__items {
-    display: flex;
-    grid-template-columns: none !important;
+    display: block;
+    // grid-template-columns: none !important;
   }
 
   &__item {
