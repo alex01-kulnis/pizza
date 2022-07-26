@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { useSelector, useDispatch } from 'react-redux';
 
 import Categories from '../components/Categories';
 import Sort from '../components/Sort';
 import PizzaBlock from '../components/PizzaBlock';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
+import { AppContext } from '../App';
+import { setCategoryId } from '../redux/slices/filterSlice';
 
-const Home = ({ searchValue }) => {
+const Home = () => {
+  const dispatch = useDispatch();
+  const { categoryId, sort } = useSelector((state) => state.filter);
+
+  const { searchValue } = useContext(AppContext);
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [categoryId, setCategoryId] = useState(0);
-  const [sortType, setSortType] = useState({ name: 'популярности', sortProperty: 'rating' });
 
   useEffect(() => {
     async function fetchData() {
@@ -22,7 +27,7 @@ const Home = ({ searchValue }) => {
       const search = searchValue ? `&search=${searchValue}` : '';
 
       const itemsResp = await axios.get(
-        `https://62d52f16d4406e523554ca5d.mockapi.io/items?page=${currentPage}&limit=4&${category}&sortBy=${sortType.sortProperty}&order=desc${search}`,
+        `https://62d52f16d4406e523554ca5d.mockapi.io/items?page=${currentPage}&limit=4&${category}&sortBy=${sort.sortProperty}&order=desc${search}`,
       );
 
       setItems(itemsResp.data);
@@ -31,7 +36,15 @@ const Home = ({ searchValue }) => {
       window.scrollTo(0, 0);
     }
     fetchData();
-  }, [categoryId, sortType, searchValue, currentPage]);
+  }, [categoryId, sort.sortType, searchValue, currentPage]);
+
+  const onChangeCategory = (id) => {
+    dispatch(setCategoryId(id));
+  };
+
+  const onChangeSort = (id) => {
+    dispatch(setCategoryId(id));
+  };
 
   const pizzas = items
     .filter((obj) => {
@@ -44,8 +57,8 @@ const Home = ({ searchValue }) => {
   return (
     <div className="container">
       <div className="content__top">
-        <Categories value={categoryId} onChangeCategory={(i) => setCategoryId(i)} />
-        <Sort value={sortType} onChangeSort={(i) => setSortType(i)} />
+        <Categories value={categoryId} onChangeCategory={onChangeCategory} />
+        <Sort />
       </div>
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">{isLoading ? skeletons : pizzas}</div>
