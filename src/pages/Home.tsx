@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useCallback, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import qs from 'qs';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,56 +11,69 @@ import Sort, { list } from '../components/Sort';
 import PizzaBlock from '../components/PizzaBlock';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
-import { fetchPizzas, selectPizzaData } from '../redux/slices/pizzaSlice';
+import { fetchPizzas, SearchPizzaParams, selectPizzaData } from '../redux/slices/pizzaSlice';
+import { useAppDispatch } from '../redux/store';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { categoryId, sort, currentPage, searchValue } = useSelector(selectFilter);
   const { items, status } = useSelector(selectPizzaData);
 
-  const onChangeCategory = (idx: number) => {
+  const onChangeCategory = useCallback((idx: number) => {
     dispatch(setCategoryId(idx));
-  };
+  }, []);
 
   const onChangePage = (page: number) => {
     dispatch(setCurrentPage(page));
   };
 
   const getPizzas = async () => {
-    const category = categoryId > 0 ? `category=${categoryId}` : '';
-    const search = searchValue ? `&search=${searchValue}` : '';
-    console.log(category);
-    console.log(search);
-
-    // @ts-ignore
-    dispatch(fetchPizzas({ category, search, currentPage, sort }));
+    // const category = categoryId > 0 ? `category=${categoryId}` : '';
+    // const search = searchValue ? `&search=${searchValue}` : '';
+    const sortBy = sort.sortProperty;
+    // const order = sort.sortProperty.includes('-') ? 'asc' : 'desc';
+    const category = categoryId > 0 ? String(categoryId) : '';
+    const search = searchValue;
+    dispatch(fetchPizzas({ category, search, currentPage: String(currentPage), sortBy }));
     window.scrollTo(0, 0);
   };
 
-  useEffect(() => {
-    if (window.location.search) {
-      const params = qs.parse(window.location.search.substring(1));
+  // useEffect(() => {
+  //   if (window.location.search) {
+  //     const params = qs.parse(window.location.search.substring(1)) as unknown as SearchPizzaParams;
 
-      const sort = list.find((obj) => obj.sortProperty === params.sortProperty);
+  //     const sort = list.find((obj) => obj.sortProperty === params.sort);
 
-      dispatch(setFilters({ ...params, sort }));
-    }
-  }, []);
+  //     if (sort) {
+  //       params.sort = sort;
+  //     }
+
+  //     dispatch(
+  //       setFilters({
+  //         searchValue: params.search,
+  //         categoryId: Number(params.category),
+  //         currentPage: Number(params.currentPage),
+  //         sort: sort || list[0],
+  //       }),
+  //     );
+  //     // dispatch(setFilters({ ...params, sort }));
+  //   }
+  // }, []);
 
   useEffect(() => {
     getPizzas();
   }, [categoryId, searchValue, currentPage, sort.sortProperty]);
 
-  useEffect(() => {
-    const queryString = qs.stringify({
-      sortProperty: sort.sortProperty,
-      categoryId,
-      currentPage,
-    });
-    navigate(`?${queryString}`);
-  }, [categoryId, currentPage, sort.sortProperty]);
+  // useEffect(() => {
+  //   const queryString = qs.stringify({
+  //     sortProperty: sort.sortProperty,
+  //     categoryId,
+  //     currentPage,
+  //   });
+  //   navigate(`?${queryString}`);
+  // }, [categoryId, currentPage, sort.sortProperty]);
 
   const pizzas = items
     .filter((obj: any) => {
@@ -73,7 +87,7 @@ const Home: React.FC = () => {
     <div className="container">
       <div className="content__top">
         <Categories value={categoryId} onChangeCategory={onChangeCategory} />
-        <Sort />
+        <Sort value={sort} />
       </div>
       <h2 className="content__title">Все пиццы</h2>
       {status === 'error' ? (
